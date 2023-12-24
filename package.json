@@ -1,7 +1,8 @@
 {
   "name": "telegram-markdown-sanitizer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Telegram markdown sanitizer",
+  "keywords": ["telegram", "markdown"],
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
