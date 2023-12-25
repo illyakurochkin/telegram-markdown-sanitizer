@@ -45,6 +45,41 @@ describe('sanitizeMarkdown', () => {
 
       expect(sanitizeMarkdown(input)).toEqual(output)
     })
+
+    it('should not escape links in multiline code blocks', () => {
+      const input =
+        '```python\n' +
+        'print("Hello [World](https://example.com)")\n' +
+        '```\n'
+
+      const output =
+        '```python\n' +
+        'print("Hello [World](https://example.com)")\n' +
+        '```\n'
+
+      expect(sanitizeMarkdown(input)).toEqual(output)
+    })
+  })
+
+  describe('links', () => {
+    it('should keep link without changing', () => {
+      const input = '[hello world](https://example.com)'
+
+      const output = '[hello world](https://example.com)'
+
+      expect(sanitizeMarkdown(input)).toEqual(output)
+    })
+
+    it.each(SPECIAL_CHARACTERS.filter((character) => character !== ']'))(
+      'should escape special characters inside link (except "]") - "%s"',
+      (character) => {
+        const input = `[hello ${character} world](https://example.com/hello#world)`
+
+        const output = `[hello \\${character} world](https://example.com/hello#world)`
+
+        expect(sanitizeMarkdown(input)).toEqual(output)
+      },
+    )
   })
 
   describe('single line code blocks', () => {

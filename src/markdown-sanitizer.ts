@@ -1,6 +1,7 @@
 const MULTILINE_CODE_REGEX = '(?<=\\n|^)```.*\\n?((?:.|\\n)*?)(?:\\n```|$)'
 const SINGLE_LINE_CODE_REGEX = '(`.*?`)'
-const SPECIAL_SYMBOL = '([_*\\[\\]()~`>#+\\-=|{}.!])'
+const LINK_REGEX = '\\[(.*?)\\]\\((.*?)\\)'
+const SPECIAL_SYMBOL_REGEX = '([_*\\[\\]()~`>#+\\-=|{}.!])'
 
 /**
  * Sanitize markdown input
@@ -13,23 +14,46 @@ const SPECIAL_SYMBOL = '([_*\\[\\]()~`>#+\\-=|{}.!])'
  */
 export const sanitizeMarkdown = (input: string): string => {
   const regex = new RegExp(
-    `${MULTILINE_CODE_REGEX}|${SINGLE_LINE_CODE_REGEX}|${SPECIAL_SYMBOL}`,
+    [
+      MULTILINE_CODE_REGEX,
+      SINGLE_LINE_CODE_REGEX,
+      LINK_REGEX,
+      SPECIAL_SYMBOL_REGEX,
+    ].join('|'),
     'g',
   )
 
   return input.replace(
     regex,
-    (match, g1_multilineCodeContent, g2_singleLineCode, g3_specialSymbol) => {
-      if (g1_multilineCodeContent) {
+    (
+      match,
+      multilineCodeContent,
+      singleLineCode,
+      linkLabel,
+      linkUrl,
+      specialSymbol,
+    ) => {
+      if (multilineCodeContent) {
         return match.replace(
-          g1_multilineCodeContent,
-          g1_multilineCodeContent.replace(/`/g, '\\`'),
+          multilineCodeContent,
+          multilineCodeContent.replace(/`/g, '\\`'),
         )
-      } else if (g2_singleLineCode) {
-        return g2_singleLineCode
-      } else if (g3_specialSymbol) {
-        return `\\${g3_specialSymbol}`
       }
+
+      if (singleLineCode) return singleLineCode
+
+      if (linkLabel && linkUrl) {
+        return match.replace(
+          linkLabel,
+          linkLabel.replace(
+            new RegExp(SPECIAL_SYMBOL_REGEX, 'g'),
+            (symbol: string) => `\\${symbol}`,
+          ),
+        )
+      }
+
+      if (specialSymbol) return `\\${specialSymbol}`
+
       return match
     },
   )
