@@ -59,6 +59,27 @@ describe('sanitizeMarkdown', () => {
 
       expect(sanitizeMarkdown(input)).toEqual(output)
     })
+
+    it('should escape the last not closed multiline block', () => {
+      const input =
+        '```python\n' +
+        'print("Hello World")\n' +
+        'print(2 * 2)\n' +
+        '```\n' +
+        'hello world\n' +
+        '```\n'
+
+      const output =
+        '```python\n' +
+        'print("Hello World")\n' +
+        'print(2 * 2)\n' +
+        '```\n' +
+        'hello world\n' +
+        '``\\`\n'
+
+      expect(sanitizeMarkdown(input)).toEqual(output)
+      
+    });
   })
 
   describe('links', () => {

@@ -1,4 +1,4 @@
-const MULTILINE_CODE_REGEX = '(?<=\\n|^)```.*\\n?((?:.|\\n)*?)(?:\\n```|$)'
+const MULTILINE_CODE_REGEX = '(?<=\\n|^)```.*\\n?((?:.|\\n)*?)(?:\\n```)'
 const SINGLE_LINE_CODE_REGEX = '(`.*?`)'
 const LINK_REGEX = '\\[(.*?)\\]\\((.*?)\\)'
 const SPECIAL_SYMBOL_REGEX = '([_*\\[\\]()~`>#+\\-=|{}.!])'
