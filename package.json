@@ -1,6 +1,6 @@
 {
   "name": "telegram-markdown-sanitizer",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Telegram markdown sanitizer",
   "keywords": ["telegram", "markdown"],
   "main": "dist/index.js",
@@ -13,6 +13,7 @@
     "test:ci": "jest --ci"
   },
   "author": "https://github.com/illyakurochkin",
+  "repository": "https://github.com/illyakurochkin/telegram-markdown-sanitizer",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.11",
