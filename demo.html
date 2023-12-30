@@ -2,33 +2,43 @@
 <html lang='en'>
 <head>
   <meta charset='UTF-8'>
-  <meta name='viewport'
-        content='width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0'>
+  <meta name='viewport' content='width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0'>
   <meta http-equiv='X-UA-Compatible' content='ie=edge'>
   <title>Demo - Telegram markdown sanitizer</title>
 </head>
 <body>
 
 
-<div class='h-[100vh] w-[100vw] bg-gradient-to-br from-[#ffcfd2] via-[#90dbf4] to-[#b9fbc0] flex flex-col md:flex-row justify-center gap-8 lg:gap-16 p-10 md:py-30 lg:py-40' >
-  <!-- input -->
-  <div class='flex-1 flex flex-col'>
-    <h2 class='pb-1 font-bold text-lg font-mono'>
-      <label for='input'>Input:</label>
-    </h2>
+<div class='h-[100vh] w-[100vw] bg-gradient-to-br from-[#ffcfd2] via-[#90dbf4] to-[#b9fbc0] flex flex-col overflow-scroll p-10'>
+  <h1 class='text-[30px] md:text-[50px] font-mono pb-10 md:pb-20'>
+    <a href='https://github.com/illyakurochkin/telegram-markdown-sanitizer'>
+      <img class='h-[1.4em] inline' src='https://cdn.freebiesupply.com/logos/large/2x/github-icon-logo-png-transparent.png' alt='github logo'/>
+      <span class='hover:font-extrabold' style="text-underline-offset: 12px;">Telegram</span>
+      <span class='hover:font-extrabold' style="text-underline-offset: 12px;">Markdown</span>
+      <span class='hover:font-extrabold' style="text-underline-offset: 12px;">Sanitizer</span>
+    </a>
+  </h1>
+  <div class='flex flex-col md:flex-row gap-8 lg:gap-12'>
+    <!-- input -->
+    <div class='flex-1 flex flex-col max-w-[780px]'>
+      <h2 class='pb-1 font-bold text-lg font-mono'>
+        <label for='input'>Input:</label>
+      </h2>
 
-    <textarea id='input' class='whitespace-nowrap resize-none bg-[#defff288] overflow-scroll rounded-md flex-1 font-mono p-[20px] focus:outline-none focus:border-[#efc3e6]'></textarea>
+      <textarea id='input' class='min-h-[300px] md:min-h-none resize-none bg-[#defff288] overflow-scroll rounded-md flex-1 font-mono p-[20px] focus:outline-none focus:border-[#efc3e6]'></textarea>
+    </div>
+    <!-- output -->
+    <div class='flex-1 flex flex-col max-w-[780px]'>
+      <h2 class='pb-1 font-bold text-lg font-mono'>Output:</h2>
+      <div id='output' role='button' class='transition duration-300 flex-1 overflow-auto bg-[#defff244] rounded-md font-mono p-[12px] border-[8px] border-[#defff200] text-left p-0'></div>
+    </div>
   </div>
-  <!-- output -->
-  <div class='flex-1 flex flex-col'>
-    <h2 class='pb-1 font-bold text-lg font-mono'>Output:</h2>
-    <button id='output' class='whitespace-nowrap overflow-auto bg-[#defff244] rounded-md font-mono p-[20px] text-left'></button>
-  </div>
+  <p class='absolute bottom-3 right-3 font-mono text-sm'>v0.0.9</p>
 </div>
 
 
 <script src='https://cdn.tailwindcss.com'></script>
-<script src='https://cdn.jsdelivr.net/npm/telegram-markdown-sanitizer@0.0.8/dist/bundle.browser.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/telegram-markdown-sanitizer@0.0.9/dist/bundle.browser.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.1.0/diff.min.js'></script>
 
 <script>
@@ -38,7 +48,26 @@
 
     // synchronize vertical scrolling
     input.addEventListener('scroll', () => { output.scrollTop = input.scrollTop })
-    // output.addEventListener('scroll', () => { input.scrollTop = output.scrollTop });
+
+    // copy result
+    output.addEventListener('click', () => {
+      // copy text to clipboard
+      const range = document.createRange();
+      range.selectNode(output);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+
+      // show copied effect
+      output.classList.add('!bg-transparent', 'border-[#b9fbc0]');
+      output.classList.remove('border-[#defff200]');
+
+      setTimeout(() => {
+        output.classList.remove('!bg-transparent', 'border-[#b9fbc0]');
+        output.classList.add('border-[#defff200]');
+      }, 300)
+    })
 
     // process input
     input.addEventListener('input', () => {
@@ -48,6 +77,8 @@
 
       const inputLines = inputValue.split('\n')
       const outputLines = outputValue.split('\n')
+
+      console.log('outputLines', outputLines);
 
       output.append(
         ...outputLines
@@ -82,6 +113,7 @@ Links:
   const getOutputLineWithDiff = ({inputLine, outputLine}) => {
     const elements = Diff.diffChars(inputLine, outputLine)
       .map((part) => {
+        console.log('part', part);
         const span = document.createElement('span');
         span.appendChild(document.createTextNode(part.value));
 
@@ -95,9 +127,11 @@ Links:
 
     const fragment = document.createDocumentFragment();
     fragment.append(...elements)
+
     const div = document.createElement('div');
     div.appendChild(fragment);
-    return div;
+    div.appendChild(document.createElement('br'))
+    return div
   }
 </script>
 
