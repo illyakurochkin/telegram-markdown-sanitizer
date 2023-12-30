@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport'
+        content='width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0'>
+  <meta http-equiv='X-UA-Compatible' content='ie=edge'>
+  <title>Demo - Telegram markdown sanitizer</title>
+</head>
+<body>
+
+
+<div class='h-[100vh] w-[100vw] bg-gradient-to-br from-[#ffcfd2] via-[#90dbf4] to-[#b9fbc0] flex flex-col md:flex-row justify-center gap-8 lg:gap-16 p-10 md:py-30 lg:py-40' >
+  <!-- input -->
+  <div class='flex-1 flex flex-col'>
+    <h2 class='pb-1 font-bold text-lg font-mono'>
+      <label for='input'>Input:</label>
+    </h2>
+
+    <textarea id='input' class='whitespace-nowrap resize-none bg-[#defff288] overflow-scroll rounded-md flex-1 font-mono p-[20px] focus:outline-none focus:border-[#efc3e6]'></textarea>
+  </div>
+  <!-- output -->
+  <div class='flex-1 flex flex-col'>
+    <h2 class='pb-1 font-bold text-lg font-mono'>Output:</h2>
+    <button id='output' class='whitespace-nowrap overflow-auto bg-[#defff244] rounded-md font-mono p-[20px] text-left'></button>
+  </div>
+</div>
+
+
+<script src='https://cdn.tailwindcss.com'></script>
+<script src='https://cdn.jsdelivr.net/npm/telegram-markdown-sanitizer@0.0.8/dist/bundle.browser.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.1.0/diff.min.js'></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const output = document.getElementById('output')
+    const input = document.getElementById('input')
+
+    // synchronize vertical scrolling
+    input.addEventListener('scroll', () => { output.scrollTop = input.scrollTop })
+    // output.addEventListener('scroll', () => { input.scrollTop = output.scrollTop });
+
+    // process input
+    input.addEventListener('input', () => {
+      const inputValue = input.value;
+      const outputValue = TelegramMarkdownSanitizer.sanitizeMarkdown(input.value);
+      output.innerHTML = '';
+
+      const inputLines = inputValue.split('\n')
+      const outputLines = outputValue.split('\n')
+
+      output.append(
+        ...outputLines
+          .map((outputLine, index) => ({ inputLine: inputLines[index], outputLine }))
+          .map(getOutputLineWithDiff)
+      )
+    });
+
+    // initialize input
+    input.value = INITIAL_MESSAGE
+    input.dispatchEvent(new Event('input'))
+  });
+
+  const INITIAL_MESSAGE = `Special Symbols:
+!@#$%^&*()_+-=<>,./?|\\';[]{}
+
+Single-line code:
+\`console.log('hi :)');\`
+
+Multi-line code:
+\`\`\`javascript
+function sayHi(name) {
+  console.log(\`Hi ${name}\`);
+}
+\`\`\`
+
+Links:
+[click * me](https://github.com)
+[https://github.com](https://github.com)
+`
+
+  const getOutputLineWithDiff = ({inputLine, outputLine}) => {
+    const elements = Diff.diffChars(inputLine, outputLine)
+      .map((part) => {
+        const span = document.createElement('span');
+        span.appendChild(document.createTextNode(part.value));
+
+        if(part.added) {
+          span.classList.add(...'bg-[#c77dff] glow-effect font-bold font-mono shadow-lg rounded-xl p-[2px]'.split(' '))
+          span.style.boxShadow = '0 0 4px 1px #42a5f5;'
+        }
+
+        return span
+      })
+
+    const fragment = document.createDocumentFragment();
+    fragment.append(...elements)
+    const div = document.createElement('div');
+    div.appendChild(fragment);
+    return div;
+  }
+</script>
+
+</body>
+</html>
