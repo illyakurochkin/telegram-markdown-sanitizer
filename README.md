@@ -6,7 +6,7 @@
 ## Problem Description 🚨
 Using Telegram Bot API with Markdown V2 requires valid markdown conforming to Telegram's specifications. Invalid markdown input can lead to message failures or display errors. This library preprocesses markdown input, converting it to a valid format by escaping all inappropriate characters while preserving valid markdown elements.
 
-## [Live Demo 👀](https://illyakurochkin.github.io/telegram-markdown-sanitizer/demo/)
+## [Live Demo 👀](https://illyakurochkin.github.io/telegram-markdown-sanitizer/demo)
 
 ## Installation 💻
 
